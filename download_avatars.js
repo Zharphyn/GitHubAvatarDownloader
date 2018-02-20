@@ -6,10 +6,9 @@ var fs = require('fs');
 
 const username = 'Zharphyn';
 const globalURL = 'https://api.github.com/repos/';
-const owner = 'jquery';
-const name = 'jquery';
+let owner = '';
+let name = '';
 
-console.log('Welcome to the GitHub Avatar Downloader!');
 
 function getOptions(repoOwner, repoName) {
   var options = {
@@ -33,7 +32,7 @@ function getRepoContributors(repoOwner, repoName, cb) {
 function downloadImageByURL(url, filePath) {
   request.get(url, function(err, res, body){
     if (err){
-    	console.log(errr);
+    	console.log(err);
     } 
     console.log('Downloading...' + url);
   })
@@ -41,23 +40,33 @@ function downloadImageByURL(url, filePath) {
 
 }
 
-
 var callback = function(err, res){
 	console.log(res);
 };
 
- getRepoContributors(owner,name, function(err, res, body) {
- 
-   var org = JSON.parse(body);
-   for (var item in org){
-   	var filepath = `./images/${org[item].login}.jpg`;
-   	downloadImageByURL(org[item].avatar_url,filepath);
-   	if (err) {
-      console.log (err);
-   	}
-   }
-  
- });
+function getOwnerAndName(){
+  if (process.argv.length >= 4) {
+  	owner = process.argv[2];
+    name = process.argv[3];
+  } else {
+	console.log('Please supply the owner and name of the repository.');
+	return false;
+  }
+  return true;
+}
 
+console.log('Welcome to the GitHub Avatar Downloader!');
+if (getOwnerAndName()) {
+  getRepoContributors(owner,name, function(err, res, body) {
+    var org = JSON.parse(body);
+    for (var item in org){
+   	  var filepath = `./images/${org[item].login}.jpg`;
+   	  downloadImageByURL(org[item].avatar_url,filepath);
+   	  if (err) {
+        console.log (err);
+   	  }
+    }
+  });
+}
 
 
